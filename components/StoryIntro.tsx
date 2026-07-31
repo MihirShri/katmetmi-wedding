@@ -9,12 +9,12 @@ const container = {
 
 const item = {
   hidden: { opacity: 0, y: 24 },
-  show: { opacity: 1, y: 0, transition: { duration: 0.78, ease: [0.16, 1, 0.3, 1] } },
+  show: { opacity: 1, y: 0, transition: { duration: 0.78, ease: [0.16, 1, 0.3, 1] as const } },
 }
 
 const rule = {
   hidden: { scaleX: 0, opacity: 0 },
-  show: { scaleX: 1, opacity: 1, transition: { duration: 0.72, ease: [0.16, 1, 0.3, 1] } },
+  show: { scaleX: 1, opacity: 1, transition: { duration: 0.72, ease: [0.16, 1, 0.3, 1] as const } },
 }
 
 export default function StoryIntro() {
