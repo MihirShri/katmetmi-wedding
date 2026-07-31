@@ -27,6 +27,8 @@ export default function GuestBook() {
   const [form, setForm] = useState({ name: '', text: '' })
   const [dbMessages, setDbMessages] = useState<Message[]>([])
   const [submitted, setSubmitted] = useState(false)
+  const [submitting, setSubmitting] = useState(false)
+  const [apiError, setApiError] = useState<string | null>(null)
   const [tickerPaused, setTickerPaused] = useState(false)
   const [flashMsg, setFlashMsg] = useState<Message | null>(null)
   const flashTimer = useRef<ReturnType<typeof setTimeout> | null>(null)
@@ -53,19 +55,28 @@ export default function GuestBook() {
       .catch(() => {})
   }, [])
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
     if (!form.name.trim() || !form.text.trim()) return
-    const newMsg: Message = { id: `temp-${Date.now()}`, name: form.name, text: form.text }
-    setDbMessages((prev) => [...prev, newMsg])
-    setFlashMsg(newMsg)
-    setSubmitted(true)
-    setForm({ name: '', text: '' })
-    fetch('/api/guestbook', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ name: form.name, message: form.text }),
-    }).catch(() => {})
+    setSubmitting(true)
+    setApiError(null)
+    try {
+      const res = await fetch('/api/guestbook', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ name: form.name, message: form.text }),
+      })
+      if (!res.ok) throw new Error()
+      const newMsg: Message = { id: `temp-${Date.now()}`, name: form.name, text: form.text }
+      setDbMessages((prev) => [...prev, newMsg])
+      setFlashMsg(newMsg)
+      setSubmitted(true)
+      setForm({ name: '', text: '' })
+    } catch {
+      setApiError("Your words deserve better than a network error. Try once more?")
+    } finally {
+      setSubmitting(false)
+    }
   }
 
   const ticker = [...dbMessages, ...dbMessages]
@@ -131,11 +142,16 @@ export default function GuestBook() {
                 />
               </div>
 
+              {apiError && (
+                <p className="font-serif italic text-dark/50 text-sm text-center">{apiError}</p>
+              )}
+
               <button
                 type="submit"
-                className="mt-2 py-4 bg-dark text-cream font-sans text-[11px] tracking-[0.22em] uppercase hover:bg-terracotta transition-colors duration-200"
+                disabled={submitting}
+                className="mt-2 py-4 bg-dark text-cream font-sans text-[11px] tracking-[0.22em] uppercase hover:bg-terracotta disabled:opacity-40 disabled:cursor-not-allowed transition-colors duration-200"
               >
-                Leave a blessing
+                {submitting ? 'Sending…' : 'Leave a blessing'}
               </button>
             </motion.form>
           ) : (

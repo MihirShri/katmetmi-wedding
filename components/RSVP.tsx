@@ -28,6 +28,7 @@ const INITIAL: FormState = {
 export default function RSVP() {
   const [form, setForm] = useState<FormState>(INITIAL)
   const [submitted, setSubmitted] = useState(false)
+  const [submitting, setSubmitting] = useState(false)
   const [error, setError] = useState<string | null>(null)
   const sectionRef = useRef<HTMLElement>(null)
 
@@ -47,19 +48,28 @@ export default function RSVP() {
         : [...p.functions, fn],
     }))
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
     if (!form.name.trim()) return
     if (!form.attending) {
-      setError('Please let us know if you\'re coming.')
+      setError("Please let us know if you're coming.")
       return
     }
-    setSubmitted(true)
-    fetch('/api/rsvp', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(form),
-    }).catch(() => {})
+    setSubmitting(true)
+    setError(null)
+    try {
+      const res = await fetch('/api/rsvp', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(form),
+      })
+      if (!res.ok) throw new Error()
+      setSubmitted(true)
+    } catch {
+      setError("Our internet had feelings. Your RSVP didn't go through — please try again.")
+    } finally {
+      setSubmitting(false)
+    }
   }
 
   const inputCls =
@@ -249,10 +259,10 @@ export default function RSVP() {
 
               <button
                 type="submit"
-                disabled={!form.name.trim()}
+                disabled={!form.name.trim() || submitting}
                 className="mt-1 py-4 bg-dark text-cream font-sans text-[11px] tracking-[0.22em] uppercase hover:bg-terracotta disabled:opacity-40 disabled:cursor-not-allowed transition-colors duration-200"
               >
-                Send RSVP
+                {submitting ? 'Sending…' : 'Send RSVP'}
               </button>
             </motion.form>
           ) : (

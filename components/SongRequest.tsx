@@ -13,6 +13,8 @@ const SUCCESS_LINES = [
 export default function SongRequest() {
   const [form, setForm] = useState({ song: '', artist: '', from: '' })
   const [submitted, setSubmitted] = useState(false)
+  const [submitting, setSubmitting] = useState(false)
+  const [apiError, setApiError] = useState<string | null>(null)
   const [successLine, setSuccessLine] = useState('')
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -22,23 +24,29 @@ export default function SongRequest() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
     if (!form.song.trim()) return
+    setSubmitting(true)
+    setApiError(null)
     try {
-      await fetch('/api/songs', {
+      const res = await fetch('/api/songs', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(form),
       })
+      if (!res.ok) throw new Error()
+      setSuccessLine(SUCCESS_LINES[Math.floor(Math.random() * SUCCESS_LINES.length)])
+      setSubmitted(true)
     } catch {
-      // show success regardless — worst case the request didn't save
+      setApiError("The DJ dropped your request. Give it another try?")
+    } finally {
+      setSubmitting(false)
     }
-    setSuccessLine(SUCCESS_LINES[Math.floor(Math.random() * SUCCESS_LINES.length)])
-    setSubmitted(true)
   }
 
   const handleReset = () => {
     setForm({ song: '', artist: '', from: '' })
     setSubmitted(false)
     setSuccessLine('')
+    setApiError(null)
   }
 
   return (
@@ -111,11 +119,16 @@ export default function SongRequest() {
                 />
               </div>
 
+              {apiError && (
+                <p className="font-serif italic text-dark/50 text-sm text-center">{apiError}</p>
+              )}
+
               <button
                 type="submit"
-                className="mt-2 py-3.5 bg-dark text-cream font-sans text-[11px] tracking-[0.22em] uppercase hover:bg-terracotta transition-colors duration-200"
+                disabled={submitting}
+                className="mt-2 py-3.5 bg-dark text-cream font-sans text-[11px] tracking-[0.22em] uppercase hover:bg-terracotta disabled:opacity-40 disabled:cursor-not-allowed transition-colors duration-200"
               >
-                Add to the playlist
+                {submitting ? 'Sending…' : 'Add to the playlist'}
               </button>
 
               <p className="font-sans text-[10px] text-muted/50 italic text-center mt-1">
