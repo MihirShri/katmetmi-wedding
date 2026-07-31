@@ -119,7 +119,7 @@ export default function NavBar() {
                   onClick={closeMenu}
                   initial={{ opacity: 0, y: 24 }}
                   animate={{ opacity: 1, y: 0 }}
-                  transition={{ delay: 0.06 + i * 0.07, duration: 0.4, ease: [0.16, 1, 0.3, 1] }}
+                  transition={{ delay: 0.06 + i * 0.07, duration: 0.4, ease: [0.16, 1, 0.3, 1] as const }}
                   className="font-serif italic text-cream/80 hover:text-terracotta transition-colors py-4 text-center w-full border-b border-cream/8 last:border-0"
                   style={{ fontSize: 'clamp(2rem, 8vw, 2.8rem)' }}
                 >

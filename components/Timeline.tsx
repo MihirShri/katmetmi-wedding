@@ -205,7 +205,7 @@ function MobileChapterCard({ chapter }: { chapter: Chapter }) {
   const fade = (delay: number) => ({
     initial: { opacity: 0, y: 22 },
     animate: inView ? { opacity: 1, y: 0 } : { opacity: 0, y: 22 },
-    transition: { duration: 0.75, delay, ease: [0.16, 1, 0.3, 1] },
+    transition: { duration: 0.75, delay, ease: [0.16, 1, 0.3, 1] as const },
   })
 
   if (chapter.photoSide === 'none') {
@@ -291,7 +291,7 @@ function DesktopBook() {
     // Phase 1 — current page folds away (0° → edge-on)
     await pageControls.start({
       rotateY: forward ? -90 : 90,
-      transition: { duration: 0.26, ease: [0.4, 0, 1, 1] },
+      transition: { duration: 0.26, ease: [0.4, 0, 1, 1] as const },
     })
 
     // Swap content while the page is invisible (edge-on)
@@ -301,7 +301,7 @@ function DesktopBook() {
     // Phase 2 — new page unfolds into view (edge-on → 0°)
     await pageControls.start({
       rotateY: 0,
-      transition: { duration: 0.26, ease: [0, 0, 0.2, 1] },
+      transition: { duration: 0.26, ease: [0, 0, 0.2, 1] as const },
     })
 
     flippingRef.current = false

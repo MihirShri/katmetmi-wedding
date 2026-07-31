@@ -422,7 +422,7 @@ function EventPanel({ event }: { event: EventData }) {
       ref={ref}
       initial={{ opacity: 0, y: 24 }}
       animate={inView ? { opacity: 1, y: 0 } : {}}
-      transition={{ duration: 0.85, ease: [0.16, 1, 0.3, 1] }}
+      transition={{ duration: 0.85, ease: [0.16, 1, 0.3, 1] as const }}
       className={`grid ${isPhotoRight ? 'md:grid-cols-[58fr_42fr]' : 'md:grid-cols-[42fr_58fr]'}`}
     >
       {isPhotoRight ? (

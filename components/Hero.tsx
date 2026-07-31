@@ -50,7 +50,7 @@ export default function Hero() {
         className="absolute inset-0"
         initial={{ scale: 1.07 }}
         animate={{ scale: 1 }}
-        transition={{ duration: 2.6, ease: [0.16, 1, 0.3, 1] }}
+        transition={{ duration: 2.6, ease: [0.16, 1, 0.3, 1] as const }}
       >
         <Image
           src="/engagement.jpeg"
@@ -109,7 +109,7 @@ export default function Hero() {
           <motion.div
             initial={{ scaleX: 0 }}
             animate={{ scaleX: 1 }}
-            transition={{ duration: 0.9, delay: 3.1, ease: [0.16, 1, 0.3, 1] }}
+            transition={{ duration: 0.9, delay: 3.1, ease: [0.16, 1, 0.3, 1] as const }}
             className="h-px w-10 sm:w-14 bg-terracotta/55"
             style={{ transformOrigin: 'right' }}
           />
@@ -122,7 +122,7 @@ export default function Hero() {
           <motion.div
             initial={{ scaleX: 0 }}
             animate={{ scaleX: 1 }}
-            transition={{ duration: 0.9, delay: 3.1, ease: [0.16, 1, 0.3, 1] }}
+            transition={{ duration: 0.9, delay: 3.1, ease: [0.16, 1, 0.3, 1] as const }}
             className="h-px w-10 sm:w-14 bg-terracotta/55"
             style={{ transformOrigin: 'left' }}
           />
