@@ -222,7 +222,7 @@ const EVENTS: EventData[] = [
 
 function EventPanel({ event }: { event: EventData }) {
   const ref = useRef<HTMLDivElement>(null)
-  const inView = useInView(ref, { once: true, margin: '-80px' })
+  const inView = useInView(ref, { once: true, amount: 0.3 })
   const burstFired = useRef(false)
 
   useEffect(() => {
