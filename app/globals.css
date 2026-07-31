@@ -1,26 +1,64 @@
 @import "tailwindcss";
 
-:root {
-  --background: #ffffff;
-  --foreground: #171717;
-}
-
 @theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
+  --color-cream: #FDFAF6;
+  --color-dark: #1A1108;
+  --color-terracotta: #C9956C;
+  --color-gold: #B8935A;
+  --color-muted: #8B7355;
+  --color-sand: #F5EDE0;
+  --color-card: #FAF4EC;
+  --font-sans: var(--font-dm-sans), sans-serif;
+  --font-serif: var(--font-cormorant), serif;
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+html {
+  scroll-behavior: smooth;
+  scroll-padding-top: 80px;
 }
 
 body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  background-color: #FDFAF6;
+  color: #1A1108;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+@keyframes ticker-scroll {
+  0% { transform: translateX(0); }
+  100% { transform: translateX(-50%); }
+}
+
+@keyframes text-shimmer {
+  0%, 55% { background-position: 100% center; }
+  100%    { background-position: 0% center; }
+}
+
+@keyframes story-cta-pulse {
+  0%, 100% { box-shadow: 0 0 0 1px rgba(26,17,8,0.2); color: rgba(26,17,8,0.45); }
+  46%, 54% { box-shadow: 0 0 0 1px #C9956C; color: #C9956C; }
+}
+
+.story-cta-pulse {
+  animation: story-cta-pulse 1.8s ease-in-out infinite;
+}
+
+.date-shimmer {
+  background: linear-gradient(
+    90deg,
+    rgba(253,250,246,0.9)  0%,
+    rgba(253,250,246,0.9)  35%,
+    rgba(201,149,108,0.9)  42%,
+    rgba(212,168,87,1)     47%,
+    rgba(255,220,140,1)    50%,
+    rgba(212,168,87,1)     53%,
+    rgba(201,149,108,0.9)  58%,
+    rgba(253,250,246,0.9)  65%,
+    rgba(253,250,246,0.9)  100%
+  );
+  background-size: 300% auto;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  animation: text-shimmer 2.5s ease-in-out infinite;
 }
