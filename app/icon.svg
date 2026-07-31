@@ -1,0 +1,11 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100">
+  <rect width="100" height="100" fill="#1A1108"/>
+  <text
+    x="50"
+    y="50"
+    text-anchor="middle"
+    dominant-baseline="central"
+    font-size="62"
+    fill="#C9956C"
+  >♥</text>
+</svg>

@@ -162,7 +162,7 @@ const EVENTS: EventData[] = [
     name: 'Haldi',
     day: 'Day 1',
     date: '25 November 2026',
-    time: '12:00 PM onwards',
+    time: '12 noon onwards',
     dressCode: 'Yellow',
     dressNote:
       'Every shade — mustard, turmeric, lemon, butter. The brighter the better. Yes, it will stain.',
