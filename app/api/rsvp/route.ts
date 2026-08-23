@@ -3,14 +3,16 @@ import { appendRow } from '@/lib/sheets'
 
 export async function POST(req: NextRequest) {
   const body = await req.json()
-  const { name, email, attending, guests, functions, diet, message } = body
+  const { name, email, attending, guests, functions, diet, message, side } = body
 
   if (!name?.trim() || !attending) {
     return NextResponse.json({ error: 'Name and attendance required' }, { status: 400 })
   }
 
+  const tab = side === 'groom' ? 'RSVPs_Groom' : 'RSVPs'
+
   try {
-    await appendRow('RSVPs', [
+    await appendRow(tab, [
       new Date().toISOString(),
       name.trim(),
       email?.trim() || '',

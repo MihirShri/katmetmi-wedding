@@ -28,11 +28,14 @@ const UNITS = [
   { key: 'days' as const, label: 'Sunsets', sub: 'remaining' },
   { key: 'hours' as const, label: 'Hours', sub: 'give or take' },
   { key: 'minutes' as const, label: 'Minutes', sub: 'of peace left' },
-  { key: 'seconds' as const, label: 'Heartbeats', sub: 'but who’s counting' },
+  { key: 'seconds' as const, label: 'Heartbeats', sub: 'but who\'s counting' },
 ]
+
+const EASE = [0.16, 1, 0.3, 1] as const
 
 export default function Hero() {
   const [mounted, setMounted] = useState(false)
+  const [animReady, setAnimReady] = useState(false)
   const [timeLeft, setTimeLeft] = useState<TimeLeft>({ days: 0, hours: 0, minutes: 0, seconds: 0 })
 
   useEffect(() => {
@@ -42,15 +45,30 @@ export default function Hero() {
     return () => clearInterval(id)
   }, [])
 
+  useEffect(() => {
+    // Returning visitor — side already chosen, animate immediately
+    if (localStorage.getItem('katmetmi-side')) {
+      setAnimReady(true)
+      return
+    }
+    // First-time visitor — wait for gate to close
+    const handler = () => setAnimReady(true)
+    window.addEventListener('katmetmi-gate-closed', handler)
+    return () => window.removeEventListener('katmetmi-gate-closed', handler)
+  }, [])
+
+  // Each element holds its initial state until animReady, then smoothly transitions
+  const show = animReady
+
   return (
     <section className="relative h-screen flex flex-col items-center justify-center px-6 overflow-hidden">
 
-      {/* ─── Background photo — slowly zooms out on load ─────────────────── */}
+      {/* ─── Background photo — zooms out once gate closes ───────────────── */}
       <motion.div
         className="absolute inset-0"
         initial={{ scale: 1.07 }}
-        animate={{ scale: 1 }}
-        transition={{ duration: 2.6, ease: [0.16, 1, 0.3, 1] as const }}
+        animate={{ scale: show ? 1 : 1.07 }}
+        transition={{ duration: 2.6, ease: EASE }}
       >
         <Image
           src="/engagement.jpeg"
@@ -60,9 +78,7 @@ export default function Hero() {
           priority
         />
       </motion.div>
-      {/* Dark gradient — heavier at top (text) and bottom, lighter in middle */}
       <div className="absolute inset-0 bg-gradient-to-b from-dark/80 via-dark/30 to-dark/70" />
-      {/* Subtle side vignette */}
       <div className="absolute inset-0" style={{ background: 'radial-gradient(ellipse 80% 100% at 50% 50%, transparent 40%, rgba(26,17,8,0.55) 100%)' }} />
 
       {/* ─── Content ─────────────────────────────────────────────────────── */}
@@ -71,7 +87,7 @@ export default function Hero() {
         {/* #KatMetMi label */}
         <motion.p
           initial={{ opacity: 0, y: 12 }}
-          animate={{ opacity: 1, y: 0 }}
+          animate={show ? { opacity: 1, y: 0 } : { opacity: 0, y: 12 }}
           transition={{ duration: 1.0, delay: 0.8 }}
           className="font-sans text-[11px] tracking-[0.38em] uppercase text-terracotta mb-10 mt-14"
         >
@@ -81,7 +97,7 @@ export default function Hero() {
         {/* Names */}
         <motion.div
           initial={{ opacity: 0, y: 28 }}
-          animate={{ opacity: 1, y: 0 }}
+          animate={show ? { opacity: 1, y: 0 } : { opacity: 0, y: 28 }}
           transition={{ duration: 1.2, delay: 1.7 }}
         >
           <h1
@@ -102,14 +118,14 @@ export default function Hero() {
         {/* Date — flanked by extending terracotta lines */}
         <motion.div
           initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
+          animate={show ? { opacity: 1 } : { opacity: 0 }}
           transition={{ duration: 1.0, delay: 2.9 }}
           className="flex items-center justify-center gap-4 mt-8 mb-3"
         >
           <motion.div
             initial={{ scaleX: 0 }}
-            animate={{ scaleX: 1 }}
-            transition={{ duration: 0.9, delay: 3.1, ease: [0.16, 1, 0.3, 1] as const }}
+            animate={show ? { scaleX: 1 } : { scaleX: 0 }}
+            transition={{ duration: 0.9, delay: 3.1, ease: EASE }}
             className="h-px w-10 sm:w-14 bg-terracotta/55"
             style={{ transformOrigin: 'right' }}
           />
@@ -121,8 +137,8 @@ export default function Hero() {
           </p>
           <motion.div
             initial={{ scaleX: 0 }}
-            animate={{ scaleX: 1 }}
-            transition={{ duration: 0.9, delay: 3.1, ease: [0.16, 1, 0.3, 1] as const }}
+            animate={show ? { scaleX: 1 } : { scaleX: 0 }}
+            transition={{ duration: 0.9, delay: 3.1, ease: EASE }}
             className="h-px w-10 sm:w-14 bg-terracotta/55"
             style={{ transformOrigin: 'left' }}
           />
@@ -131,7 +147,7 @@ export default function Hero() {
         {/* Quirky countdown pre-label */}
         <motion.p
           initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
+          animate={show ? { opacity: 1 } : { opacity: 0 }}
           transition={{ duration: 0.9, delay: 3.8 }}
           className="font-serif italic text-cream/25 text-sm mb-8"
         >
@@ -141,7 +157,7 @@ export default function Hero() {
         {/* Countdown boxes */}
         <motion.div
           initial={{ opacity: 0, y: 16 }}
-          animate={{ opacity: 1, y: 0 }}
+          animate={show ? { opacity: 1, y: 0 } : { opacity: 0, y: 16 }}
           transition={{ duration: 0.9, delay: 4.4 }}
           className="flex gap-2 sm:gap-4 justify-center"
         >
@@ -168,7 +184,7 @@ export default function Hero() {
         {/* Quirky countdown post-label */}
         <motion.p
           initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
+          animate={show ? { opacity: 1 } : { opacity: 0 }}
           transition={{ duration: 0.9, delay: 5.1 }}
           className="font-serif italic text-cream/20 text-xs mt-5"
         >
@@ -180,7 +196,7 @@ export default function Hero() {
       <motion.div
         className="absolute bottom-8 left-1/2 -translate-x-1/2"
         initial={{ opacity: 0 }}
-        animate={{ opacity: 1 }}
+        animate={show ? { opacity: 1 } : { opacity: 0 }}
         transition={{ delay: 5.8, duration: 0.5 }}
       >
         <motion.div

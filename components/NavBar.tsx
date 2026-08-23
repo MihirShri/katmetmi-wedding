@@ -11,9 +11,14 @@ const HOME_LINKS = [
   { label: 'RSVP', href: '#rsvp' },
 ]
 
+function switchSide() {
+  window.dispatchEvent(new CustomEvent('katmetmi-switch-side'))
+}
+
 export default function NavBar() {
   const [scrolled, setScrolled] = useState(false)
   const [menuOpen, setMenuOpen] = useState(false)
+  const [side, setSide] = useState<string | null>(null)
   const { scrollYProgress } = useScroll()
   const pathname = usePathname()
   const isHome = pathname === '/'
@@ -29,6 +34,18 @@ export default function NavBar() {
     const handler = () => setScrolled(window.scrollY > 60)
     window.addEventListener('scroll', handler, { passive: true })
     return () => window.removeEventListener('scroll', handler)
+  }, [])
+
+  useEffect(() => {
+    setSide(localStorage.getItem('katmetmi-side'))
+    const onGateClosed = () => setSide(localStorage.getItem('katmetmi-side'))
+    const onSwitch = () => setSide(null)
+    window.addEventListener('katmetmi-gate-closed', onGateClosed)
+    window.addEventListener('katmetmi-switch-side', onSwitch)
+    return () => {
+      window.removeEventListener('katmetmi-gate-closed', onGateClosed)
+      window.removeEventListener('katmetmi-switch-side', onSwitch)
+    }
   }, [])
 
   // Lock body scroll when mobile menu is open
@@ -73,6 +90,15 @@ export default function NavBar() {
                 {label}
               </a>
             ))}
+            {side && (
+              <button
+                onClick={switchSide}
+                className="font-sans text-[10px] tracking-[0.18em] uppercase text-terracotta/70 hover:text-terracotta transition-colors flex items-center gap-1.5"
+              >
+                Team {side === 'groom' ? 'Groom' : 'Bride'}
+                <span className="text-[11px]">⇄</span>
+              </button>
+            )}
           </div>
 
           {/* Hamburger — mobile only */}
@@ -127,6 +153,19 @@ export default function NavBar() {
                 </motion.a>
               ))}
             </nav>
+
+            {/* Switch sides */}
+            {side && (
+              <motion.button
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                transition={{ delay: 0.42, duration: 0.4 }}
+                onClick={() => { closeMenu(); switchSide() }}
+                className="absolute bottom-20 font-sans text-[10px] tracking-[0.28em] uppercase text-terracotta/60 hover:text-terracotta transition-colors"
+              >
+                Team {side === 'groom' ? 'Groom' : 'Bride'} · Switch sides ⇄
+              </motion.button>
+            )}
 
             {/* Decorative bottom note */}
             <motion.p

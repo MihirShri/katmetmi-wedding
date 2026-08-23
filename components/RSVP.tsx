@@ -58,10 +58,11 @@ export default function RSVP() {
     setSubmitting(true)
     setError(null)
     try {
+      const side = localStorage.getItem('katmetmi-side') ?? 'bride'
       const res = await fetch('/api/rsvp', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(form),
+        body: JSON.stringify({ ...form, side }),
       })
       if (!res.ok) throw new Error()
       setSubmitted(true)

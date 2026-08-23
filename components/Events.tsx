@@ -1,6 +1,6 @@
 'use client'
 
-import { useRef, useEffect } from 'react'
+import { useRef, useEffect, useState } from 'react'
 import { motion, useInView } from 'framer-motion'
 import Image from 'next/image'
 
@@ -18,6 +18,7 @@ type Particle = {
 const H_COLS = ['#F0C115','#FFD700','#E8A020','#FFF176','#FFCA28','#C8960A','#FAE870']
 const S_COLS = ['#E040FB','#FF4081','#40C4FF','#69F0AE','#FFD740','#FF6E40','#EA80FC','#18FFFF']
 const W_COLS = ['#C9956C','#B8935A','#FAD4C0','#F4A0A0','#E8C0A0','#D4896C','#FDFAF6']
+const R_COLS = ['#E8D5A3','#D4AF37','#F5F0E8','#C9B370','#BFA980','#FDFAF6','#E6C97A']
 
 const rnd = (a: number, b: number) => a + Math.random() * (b - a)
 const pick = <T,>(arr: T[]) => arr[Math.floor(Math.random() * arr.length)]
@@ -75,11 +76,24 @@ function weddingParticles(W: number, H: number): Particle[] {
   return out
 }
 
+function receptionParticles(W: number, H: number): Particle[] {
+  const n = W < 768 ? 40 : 70
+  const out: Particle[] = []
+  for (let i = 0; i < n; i++)
+    out.push({ x: rnd(0, W), y: rnd(-120, -10),
+      vx: rnd(-1.5, 1.5), vy: rnd(0.6, 1.6),
+      size: rnd(6, 14), color: pick(R_COLS), opacity: rnd(0.8, 1),
+      rotation: rnd(0, Math.PI * 2), rotationSpeed: rnd(-0.05, 0.05),
+      life: 0, maxLife: rnd(150, 230), type: 'rect' })
+  return out
+}
+
 function stepParticle(p: Particle, id: string): boolean {
   p.life++; p.x += p.vx; p.y += p.vy; p.rotation += p.rotationSpeed
-  if (id === 'haldi')        { p.vy += 0.2;  p.vx *= 0.97 }
-  else if (id === 'sangeet') { p.vy += 0.06; p.vx *= 0.995 }
-  else                       { p.vy += 0.012; p.vx += Math.sin(p.life * 0.04) * 0.04 }
+  if (id === 'haldi')           { p.vy += 0.2;  p.vx *= 0.97 }
+  else if (id === 'sangeet')   { p.vy += 0.06; p.vx *= 0.995 }
+  else if (id === 'reception') { p.vy += 0.03; p.vx += Math.sin(p.life * 0.03) * 0.03 }
+  else                         { p.vy += 0.012; p.vx += Math.sin(p.life * 0.04) * 0.04 }
   const t = p.life / p.maxLife
   p.opacity = t < 0.65 ? 1 : Math.max(0, (1 - t) / 0.35)
   return p.life < p.maxLife && p.opacity > 0.005
@@ -111,9 +125,10 @@ function runBurst(eventId: string) {
   document.body.appendChild(canvas)
   const ctx = canvas.getContext('2d')!
   let particles =
-    eventId === 'haldi'   ? haldiParticles(W, H) :
-    eventId === 'sangeet' ? sangeetParticles(W, H) :
-                            weddingParticles(W, H)
+    eventId === 'haldi'      ? haldiParticles(W, H) :
+    eventId === 'sangeet'    ? sangeetParticles(W, H) :
+    eventId === 'reception'  ? receptionParticles(W, H) :
+                               weddingParticles(W, H)
   let raf: number
   const tick = () => {
     ctx.clearRect(0, 0, W, H)
@@ -219,6 +234,24 @@ const EVENTS: EventData[] = [
     ],
   },
 ]
+
+const RECEPTION_EVENT: EventData = {
+  id: 'reception',
+  name: 'Reception',
+  day: 'Day 3',
+  date: '27 November 2026',
+  time: '7:00 PM onwards',
+  dressCode: 'Formals',
+  dressNote: 'Suits, blazers, tuxedos, sarees, gowns — your most dressed-up self. This one\'s for the photos.',
+  panelBg: '#0A0F1E',
+  isDark: true,
+  accent: '#D4AF37',
+  decorGradient: 'linear-gradient(145deg, #050810 0%, #0D1628 52%, #172040 100%)',
+  photoSide: 'left',
+  venue: 'Safed Baradari · Kaiser Bagh',
+  address: 'Lucknow, Uttar Pradesh',
+  mapsUrl: 'https://maps.app.goo.gl/pNjgMBJ3CprqyEKp6',
+}
 
 function EventPanel({ event }: { event: EventData }) {
   const ref = useRef<HTMLDivElement>(null)
@@ -441,6 +474,17 @@ function EventPanel({ event }: { event: EventData }) {
 }
 
 export default function Events() {
+  const [side, setSide] = useState<string | null>(null)
+
+  useEffect(() => {
+    setSide(localStorage.getItem('katmetmi-side'))
+    const handler = () => setSide(localStorage.getItem('katmetmi-side'))
+    window.addEventListener('katmetmi-gate-closed', handler)
+    return () => window.removeEventListener('katmetmi-gate-closed', handler)
+  }, [])
+
+  const events = side === 'groom' ? [...EVENTS, RECEPTION_EVENT] : EVENTS
+
   return (
     <section id="events" className="overflow-hidden">
       {/* Section header — cream, links cleanly from Timeline */}
@@ -459,7 +503,7 @@ export default function Events() {
       </div>
 
       {/* Full-bleed event panels */}
-      {EVENTS.map((event) => (
+      {events.map((event) => (
         <EventPanel key={event.id} event={event} />
       ))}
 
