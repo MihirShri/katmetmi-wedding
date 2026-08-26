@@ -227,9 +227,9 @@ const EVENTS: EventData[] = [
     address: 'Lucknow, Uttar Pradesh',
     mapsUrl: MAPS_URL,
     subEvents: [
-      { time: '5:00 PM',      name: 'Baraat Assembly',    note: 'Get in position. The procession is about to take shape.', groomOnly: true },
-      { time: '5:30 PM',      name: 'Baraat Departure',   note: 'Dhol, lights, chaos — in that order. Let\'s go.', groomOnly: true },
-      { time: '6:30 PM',      name: 'Baraat Arrival',     note: 'The groom arrives. Lights, dhol, chaos — in that order.' },
+      { time: '5:30 PM',      name: 'Baraat Assembly',    note: 'Get in position. The procession is about to take shape.', groomOnly: true },
+      { time: '6:30 PM',      name: 'Baraat Departure',   note: 'Dhol, lights, chaos — in that order. Let\'s go.', groomOnly: true },
+      { time: '7:30 PM',      name: 'Baraat Arrival',     note: 'The groom arrives. Lights, dhol, chaos — in that order.' },
       { time: '8:00 PM',      name: 'Jaimala',            note: 'The garlands are exchanged. The journey begins.' },
       { time: '9:00 PM',      name: 'Dinner & Blessings', note: 'Biryani, blessings, and a lot of happy crying.' },
       { time: '12 Midnight',  name: 'Phere',              note: 'Seven rounds, seven vows, one lifetime.' },
