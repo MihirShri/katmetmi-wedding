@@ -146,6 +146,7 @@ type SubEvent = {
   time: string
   name: string
   note: string
+  groomOnly?: boolean
 }
 
 type EventData = {
@@ -226,6 +227,8 @@ const EVENTS: EventData[] = [
     address: 'Lucknow, Uttar Pradesh',
     mapsUrl: MAPS_URL,
     subEvents: [
+      { time: '5:00 PM',      name: 'Baraat Assembly',    note: 'Get in position. The procession is about to take shape.', groomOnly: true },
+      { time: '5:30 PM',      name: 'Baraat Departure',   note: 'Dhol, lights, chaos — in that order. Let\'s go.', groomOnly: true },
       { time: '6:30 PM',      name: 'Baraat',             note: 'The groom arrives. Lights, dhol, chaos — in that order.' },
       { time: '8:00 PM',      name: 'Jaimala',            note: 'The garlands are exchanged. The journey begins.' },
       { time: '9:00 PM',      name: 'Dinner & Blessings', note: 'Biryani, blessings, and a lot of happy crying.' },
@@ -253,7 +256,7 @@ const RECEPTION_EVENT: EventData = {
   mapsUrl: 'https://maps.app.goo.gl/pNjgMBJ3CprqyEKp6',
 }
 
-function EventPanel({ event }: { event: EventData }) {
+function EventPanel({ event, side }: { event: EventData; side: string | null }) {
   const ref = useRef<HTMLDivElement>(null)
   const inView = useInView(ref, { once: true, amount: 0.3 })
   const burstFired = useRef(false)
@@ -337,7 +340,10 @@ function EventPanel({ event }: { event: EventData }) {
       </div>
 
       {/* Sub-events (wedding) */}
-      {event.subEvents && (
+      {event.subEvents && (() => {
+        const visible = event.subEvents!.filter(s => !s.groomOnly || side === 'groom')
+        if (!visible.length) return null
+        return (
         <div
           className="mb-8 pl-4"
           style={{ borderLeft: `2px solid ${event.accent}55` }}
@@ -349,7 +355,7 @@ function EventPanel({ event }: { event: EventData }) {
             Schedule
           </p>
           <div className="flex flex-col gap-4">
-            {event.subEvents.map((sub) => (
+            {visible.map((sub) => (
               <div key={sub.name} className="grid grid-cols-[5.5rem_1fr] gap-3">
                 <p
                   className="font-sans text-[11px] tracking-[0.08em] pt-0.5"
@@ -375,7 +381,8 @@ function EventPanel({ event }: { event: EventData }) {
             ))}
           </div>
         </div>
-      )}
+        )
+      })()}
 
       {/* Venue */}
       <div
@@ -504,7 +511,7 @@ export default function Events() {
 
       {/* Full-bleed event panels */}
       {events.map((event) => (
-        <EventPanel key={event.id} event={event} />
+        <EventPanel key={event.id} event={event} side={side} />
       ))}
 
     </section>
