@@ -4,6 +4,7 @@ import { useState, useRef, useEffect } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 
 const FUNCTION_LIST = ['Haldi', 'Sangeet', 'Wedding'] as const
+const FUNCTION_LIST_GROOM = ['Haldi', 'Sangeet', 'Wedding', 'Reception'] as const
 
 type FormState = {
   name: string
@@ -30,7 +31,17 @@ export default function RSVP() {
   const [submitted, setSubmitted] = useState(false)
   const [submitting, setSubmitting] = useState(false)
   const [error, setError] = useState<string | null>(null)
+  const [side, setSide] = useState<string | null>(null)
   const sectionRef = useRef<HTMLElement>(null)
+
+  const functionList = side === 'groom' ? FUNCTION_LIST_GROOM : FUNCTION_LIST
+
+  useEffect(() => {
+    setSide(localStorage.getItem('katmetmi-side'))
+    const handler = () => setSide(localStorage.getItem('katmetmi-side'))
+    window.addEventListener('katmetmi-gate-closed', handler)
+    return () => window.removeEventListener('katmetmi-gate-closed', handler)
+  }, [])
 
   useEffect(() => {
     if (submitted) {
@@ -191,7 +202,7 @@ export default function RSVP() {
                     <div>
                       <label className={labelCls}>Which functions will you attend?</label>
                       <div className="flex flex-col gap-2">
-                        {FUNCTION_LIST.map((fn) => (
+                        {functionList.map((fn) => (
                           <button
                             key={fn}
                             type="button"
